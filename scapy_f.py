@@ -10,19 +10,21 @@ class scapy_tools():
         self._snd_port = 53
 
 
-    def nslookup(self, domain):
+    def nslookup(self, domain: str):
         '''semulate the nslookup command'''
         dns_pack = Ether () / IP(dst=self._dns_server) / UDP(dport=self._snd_port)\
                 / DNS(rd=1,qd=DNSQR(qname=domain))
         answer = srp1(dns_pack,verbose = 0)
+
         print("{0} IP is: {1}".format(domain, answer["DNS Resource Record"].rdata))
 
 
-    def ping(self, domain):
+    def ping(self, domain: str):
         '''semulate the ping command'''
         print()
         time_list = []
         icmp_msg = Ether () / IP(dst = domain) / ICMP ()
+        
         for i in range(3):
 
             a = time.time()
@@ -39,16 +41,18 @@ class scapy_tools():
                 , sum(time_list) /len(time_list) ))
 
 
-    def tracert(self, domain):
+    def tracert(self, domain: str):
         '''semulate the tracert'''
         i = 1
         while True:
             icmp_msg = Ether() / IP(dst = domain, ttl = i) / ICMP()
-            ans = srp1(icmp_msg, verbose = 0)
+            ans = srp1(icmp_msg, verbose = 0, timeout = 5)
 
             print("{0}: {1}".format(i, ans[IP].src))
+            
             if ans[ICMP].type == 0:
                 break
+            
             i+=1
 
 
